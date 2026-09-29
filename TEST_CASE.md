@@ -39,15 +39,6 @@ if [[ ! "./" -ef "build" ]]; then
 fi
 
 ./C_Compressor -c
-./C_Compressor ../test_files/o.txt     
-```
-
-5) Unknown flag:
-```bash
-if [[ ! "./" -ef "build" ]]; then
-    echo "Moving to build path"
-    cd build
-fi
-
+./C_Compressor ../test_files/o.txt    
 ./C_Compressor -g ../test_files/o.txt
 ```
