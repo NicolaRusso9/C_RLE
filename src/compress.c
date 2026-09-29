@@ -27,7 +27,8 @@ int compress(const char *input_file_name) {
         return ERROR_FILE_OPEN;
     }
 
-    FILE *out = open_file_safe(output_file_name, "w");
+    // Use of "wx" to ensure exclusive creation without accidental overwrites
+    FILE *out = open_file_safe(output_file_name, "wx");
     if (!out) {
         fclose(in);
         free(output_file_name);

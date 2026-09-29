@@ -9,7 +9,7 @@
 #include "../header_files/utils.h"
 
 /**
- * Opens a file with NULL checking and error reporting.
+ * Checks if a file exists at the given path safely.
  */
 FILE *open_file_safe(const char *path, const char *mode) {
     FILE *file = fopen(path, mode);
@@ -20,14 +20,29 @@ FILE *open_file_safe(const char *path, const char *mode) {
 }
 
 /**
- * Checks if a file exists at the given path.
+ * Checks if a file exists at the given path safely.
  */
 int file_exists(const char *path) {
+    if (!path) {
+        fprintf(stderr, "Error: path is NULL\n");
+        return 0;
+    }
+
+    // Try to open file in read mode.
     FILE *file = fopen(path, "r");
-    if (file) {
+
+    // Check if file exist.
+    if ( file ) {
         fclose(file);
         return 1;
     }
+
+    // ENOENT is the only error that indicates that the file doesn't exist at the given path.
+    if (errno != ENOENT) {
+        return 1;
+    }
+
+    // File doesn't exist.
     return 0;
 }
 
