@@ -42,9 +42,10 @@ int decompress(const char *input_file_name) {
         if (ch == '\n' || ch == '\r') {
 
             if (fputc(ch, out) == EOF) {
-                fprintf(stderr, "Error writing to output file\n");
+                fprintf(stderr, "Error: Failed to write newline character.\n");
                 fclose(in);
                 fclose(out);
+                remove(output_file_name);
                 free(output_file_name);
                 return ERROR_FILE_WRITE;
             }
@@ -58,18 +59,20 @@ int decompress(const char *input_file_name) {
 
         int read_status = fscanf(in, "%d", &count);
         if (read_status != 1 || count <= 0) {
-            fprintf(stderr, "Error: Corrupted or invalid input file '%s'.\n", input_file_name);
+            fprintf(stderr, "Error: Corrupted or invalid compressed format in '%s'.\n", input_file_name);
             fclose(in);
             fclose(out);
+            remove(output_file_name);
             free(output_file_name);
             return ERROR_CORRUPT_FILE;
         }
 
         for (int i = 0; i < count; i++) {
             if (fputc(target_char, out) == EOF) {
-                fprintf(stderr, "Error writing to output file\n");
+                fprintf(stderr, "Error: Failed to write decompressed sequence.\n");
                 fclose(in);
                 fclose(out);
+                remove(output_file_name);
                 free(output_file_name);
                 return ERROR_FILE_WRITE;
             }
@@ -78,9 +81,29 @@ int decompress(const char *input_file_name) {
         ch = fgetc(in);
     }
 
-    fclose(in);
+    // Check error on input stream.
+    if (ferror(in)) {
+        fprintf(stderr, "Error: Read error occurred while reading '%s'.\n", input_file_name);
+        fclose(in);
+        fclose(out);
+        remove(output_file_name);
+        free(output_file_name);
+        return ERROR_FILE_READ;
+    }
+
+    // Check if input file close correctly
+    if (fclose(in) != 0) {
+        fprintf(stderr, "Error: Failed to close input file properly.\n");
+        fclose(out);
+        remove(output_file_name);
+        free(output_file_name);
+        return ERROR_FILE_READ;
+    }
+
+    // Check if output file close correctly
     if (fclose(out) != 0) {
-        fprintf(stderr, "Error closing output file (flush failed)\n");
+        fprintf(stderr, "Error: Failed to close output file properly.\n");
+        remove(output_file_name);
         free(output_file_name);
         return ERROR_FILE_WRITE;
     }

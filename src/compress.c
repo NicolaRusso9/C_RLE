@@ -42,9 +42,10 @@ int compress(const char *input_file_name) {
         if (current_char == '\n' || current_char == '\r') {
 
             if (fputc(current_char, out) == EOF) {
-                fprintf(stderr, "Error writing to output file\n");
+                fprintf(stderr, "Error: Failed to write character to output file.\n");
                 fclose(in);
                 fclose(out);
+                remove(output_file_name);
                 free(output_file_name);
                 return ERROR_FILE_WRITE;
             }
@@ -62,9 +63,10 @@ int compress(const char *input_file_name) {
         }
 
         if (fprintf(out, "%c%d", current_char, count) < 0) {
-            fprintf(stderr, "Error writing to output file\n");
+            fprintf(stderr, "Error: Failed to write encoded pair to output file.\n");
             fclose(in);
             fclose(out);
+            remove(output_file_name);
             free(output_file_name);
             return ERROR_FILE_WRITE;
         }
@@ -72,9 +74,29 @@ int compress(const char *input_file_name) {
         current_char = next_char;
     }
 
-    fclose(in);
+    // Check if while loop end for EOF or for reading errors.
+    if (ferror(in)) {
+        fprintf(stderr, "Error: Read error occurred while reading '%s'.\n", input_file_name);
+        fclose(in);
+        fclose(out);
+        remove(output_file_name);
+        free(output_file_name);
+        return ERROR_FILE_READ;
+    }
+
+    // Check if input file close correctly
+    if (fclose(in) != 0) {
+        fprintf(stderr, "Error: Failed to close input file properly.\n");
+        fclose(out);
+        remove(output_file_name);
+        free(output_file_name);
+        return ERROR_FILE_READ;
+    }
+
+    // Check if output file close correctly
     if (fclose(out) != 0) {
-        fprintf(stderr, "Error closing output file (flush failed)\n");
+        fprintf(stderr, "Error: Failed to close output file properly.\n");
+        remove(output_file_name);
         free(output_file_name);
         return ERROR_FILE_WRITE;
     }
