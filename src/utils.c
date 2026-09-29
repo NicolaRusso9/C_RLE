@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "../header_files/utils.h"
 
 /**
@@ -13,7 +14,7 @@
 FILE *open_file_safe(const char *path, const char *mode) {
     FILE *file = fopen(path, mode);
     if (!file) {
-        perror("Error on opening file");
+        fprintf(stderr, "Error opening file: %s\n", strerror(errno));
     }
     return file;
 }
@@ -50,7 +51,9 @@ char *generate_output_path(const char *input_path, const char *new_ext) {
     const size_t buf_size = base_len + ext_len + 32; /* Buffer allocated for counter suffixes */
     char *output_path = (char *)malloc(buf_size);
 
+    /* Check allocation memory fails and print error message */
     if (!output_path) {
+        fprintf(stderr, "Error: Memory allocation failed for output path\n");
         return NULL;
     }
 

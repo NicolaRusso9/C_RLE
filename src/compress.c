@@ -36,14 +36,18 @@ int compress(const char *input_file_name) {
 
     int current_char = fgetc(in);
     while (current_char != EOF) {
+
         /* Preserve linebreaks without counting */
         if (current_char == '\n' || current_char == '\r') {
+
             if (fputc(current_char, out) == EOF) {
+                fprintf(stderr, "Error writing to output file\n");
                 fclose(in);
                 fclose(out);
                 free(output_file_name);
                 return ERROR_FILE_WRITE;
             }
+
             current_char = fgetc(in);
             continue;
         }
@@ -57,6 +61,7 @@ int compress(const char *input_file_name) {
         }
 
         if (fprintf(out, "%c%d", current_char, count) < 0) {
+            fprintf(stderr, "Error writing to output file\n");
             fclose(in);
             fclose(out);
             free(output_file_name);
@@ -68,6 +73,7 @@ int compress(const char *input_file_name) {
 
     fclose(in);
     if (fclose(out) != 0) {
+        fprintf(stderr, "Error closing output file (flush failed)\n");
         free(output_file_name);
         return ERROR_FILE_WRITE;
     }

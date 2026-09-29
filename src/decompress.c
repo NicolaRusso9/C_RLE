@@ -37,13 +37,17 @@ int decompress(const char *input_file_name) {
 
     int ch = fgetc(in);
     while (ch != EOF) {
+
         if (ch == '\n' || ch == '\r') {
+
             if (fputc(ch, out) == EOF) {
+                fprintf(stderr, "Error writing to output file\n");
                 fclose(in);
                 fclose(out);
                 free(output_file_name);
                 return ERROR_FILE_WRITE;
             }
+
             ch = fgetc(in);
             continue;
         }
@@ -62,6 +66,7 @@ int decompress(const char *input_file_name) {
 
         for (int i = 0; i < count; i++) {
             if (fputc(target_char, out) == EOF) {
+                fprintf(stderr, "Error writing to output file\n");
                 fclose(in);
                 fclose(out);
                 free(output_file_name);
@@ -74,6 +79,7 @@ int decompress(const char *input_file_name) {
 
     fclose(in);
     if (fclose(out) != 0) {
+        fprintf(stderr, "Error closing output file (flush failed)\n");
         free(output_file_name);
         return ERROR_FILE_WRITE;
     }
