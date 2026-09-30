@@ -9,9 +9,10 @@
 /**
  * Compresses a text file using Run-Length Encoding (RLE).
  *
- * @param input_file_name Path to input .txt file.
+ * @param in Pointer to input stream .txt file.
+ * @param out Pointer to out stream .rle file.
  * @return SUCCESS (0) or error code on failure.
  */
-int compress(const char *input_file_name);
+int compress(FILE *in, FILE *out);
 
 #endif //C_Compressor_COMPRESS_H

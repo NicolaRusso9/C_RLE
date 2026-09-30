@@ -23,11 +23,7 @@
 /* Buffer Size */
 #define BUFFER_SIZE      4096
 
-/**
- * Prints user-friendly usage instructions to stdout.
- *
- * @param prog_name Name of the executable.
- */
-void print_usage(const char *prog_name);
+/* Max loop to find file name */
+#define MAX_VERSIONS     1000
 
 #endif //C_Compressor_CONSTANTS_H

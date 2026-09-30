@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "../header_files/constants.h"
+#include "../header_files/utils.h"
+#include "../header_files/driver.h"
 #include "../header_files/compress.h"
 #include "../header_files/decompress.h"
 
@@ -26,40 +28,37 @@ int main(int argc, char *argv[]) {
         return SUCCESS;
     }
 
-    /* Flags -c and -d require exactly 3 arguments: ./fileCompressor -c <input_file> */
-    if (strcmp(flag, "-c") == 0 || strcmp(flag, "-d") == 0) {
-        // Flags -c and -d require exactly 3 arguments: ./fileCompressor -c <input_file>
-        if (argc != 3) {
-            fprintf(stderr, "Error: Invalid argument(s)\n");
-            print_usage(argv[0]);
-            return ERROR_INVALID_ARGS;
-        }
-        
-        const char *file_path = argv[2];
-        int status = SUCCESS;
-
-        if (strcmp(flag, "-c") == 0) {
-            printf("Initiated compressing \"%s\"...\n", file_path);
-            status = compress(file_path);
-            if (status == SUCCESS) {
-                printf("Successfully compressed \"%s\".\n", file_path);
-            } else {
-                fprintf(stderr, "Compression of \"%s\" failed\n", file_path);
-            }
-        } else {
-            printf("Initiated decompressing \"%s\"...\n", file_path);
-            status = decompress(file_path);
-            if (status == SUCCESS) {
-                printf("Successfully decompressed \"%s\".\n", file_path);
-            } else {
-                fprintf(stderr, "Decompression of \"%s\" failed\n", file_path);
-            }
-        }
-        return status;
+    // Flags -c and -d require exactly 3 arguments: ./fileCompressor -FLAG <input_file>
+    if (argc != 3) {
+        fprintf(stderr, "Error: Invalid argument(s)\n");
+        print_usage(argv[0]);
+        return ERROR_INVALID_ARGS;
     }
 
+    const char *input_path = argv[2];
+    int status = SUCCESS;
+
+    if (strcmp(flag, "-c") == 0) {
+        printf("Initiated compressing \"%s\" ...\n", input_path);
+        status = process_file_operation(input_path, ".rle", compress);      // Set compress function pointer
+    }
+    else if (strcmp(flag, "-d") == 0){
+        printf("Initiated decompressing \"%s\"...\n", input_path);
+        status = process_file_operation(input_path, ".txt", decompress);    // Set decompress function pointer
+    }
     /* Unknown flag handling */
-    fprintf(stderr, "Error: Invalid argument(s)\n");
-    print_usage(argv[0]);
-    return ERROR_INVALID_ARGS;
+    else {
+        fprintf(stderr, "Error: Invalid argument(s)\n");
+        print_usage(argv[0]);
+        return ERROR_INVALID_ARGS;
+    }
+
+    if (status != SUCCESS) {
+        fprintf(stderr, "Operation failed with error code: %d\n", status);
+    }
+    else {
+        fprintf(stderr, "Operation completed.");
+    }
+
+    return status;
 }

@@ -12,4 +12,6 @@ add_executable(C_Compressor src/main.c
         src/compress.c
         src/decompress.c
         src/constant.c
+        header_files/driver.h
+        src/driver.c
 )

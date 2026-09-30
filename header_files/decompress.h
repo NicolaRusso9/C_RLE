@@ -9,9 +9,10 @@
 /**
  * Decompresses an RLE-encoded file into original text file.
  *
- * @param input_file_name Path to input .rle file.
+ * @param in Pointer to input stream .rle file.
+ * @param out Pointer to out stream .txt file.
  * @return SUCCESS (0) or error code on failure.
  */
-int decompress(const char *input_file_name);
+int decompress(FILE *in, FILE *out);
 
 #endif //C_Compressor_DECOMPRESS_H
